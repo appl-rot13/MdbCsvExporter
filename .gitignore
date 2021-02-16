@@ -1,0 +1,15 @@
+
+# Ignore files created by Windows
+Thumbs.db
+
+# Ignore files created by Visual Studio
+.vs/
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+
+# Ignore files created by ReSharper
+_ReSharper*/
+[Tt]est[Rr]esult*/
+*.user
