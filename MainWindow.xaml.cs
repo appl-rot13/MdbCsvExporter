@@ -9,8 +9,6 @@ namespace MdbCsvExporter
     using System.Linq;
     using System.Windows;
 
-    using Dapper;
-
     public partial class MainWindow
     {
         public MainWindow()
@@ -81,19 +79,20 @@ namespace MdbCsvExporter
                 foreach (DataRow dataRow in dataTable.Rows)
                 {
                     var tableName = dataRow["TABLE_NAME"];
-                    var tableData = (IEnumerable<IReadOnlyDictionary<string, object>>)connection.Query($"SELECT * FROM {tableName}");
+                    var tableData = new DataTable();
+                    using (var command = new OleDbCommand($"SELECT * FROM {tableName}", connection))
+                    using (var reader = command.ExecuteReader())
+                    {
+                        tableData.Load(reader);
+                    }
 
                     var outputTableData = new List<IEnumerable<string>>();
-                    var writeHeader = true;
-                    foreach (var rowData in tableData)
-                    {
-                        if (writeHeader)
-                        {
-                            outputTableData.Add(rowData.Keys);
-                            writeHeader = false;
-                        }
+                    outputTableData.Add(
+                        tableData.Columns.Cast<DataColumn>().Select(dataColumn => dataColumn.ColumnName));
 
-                        outputTableData.Add(rowData.Values.Select(value => $"{value}"));
+                    foreach (DataRow rowData in tableData.Rows)
+                    {
+                        outputTableData.Add(rowData.ItemArray.Select(value => $"{value}"));
                     }
 
                     var outputFilePath = Path.Combine(outputDirectoryPath, $"{tableName}.csv");
