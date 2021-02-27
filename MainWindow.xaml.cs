@@ -75,32 +75,32 @@ namespace MdbCsvExporter
             {
                 connection.Open();
 
-                var dataTable = connection.GetSchema("Tables", new[] { null, null, null, "TABLE" });
-                foreach (DataRow dataRow in dataTable.Rows)
+                var schema = connection.GetSchema("Tables", new[] { null, null, null, "TABLE" });
+                var tableNames = schema.Rows.OfType<DataRow>().Select(row => row["TABLE_NAME"]);
+                foreach (var tableName in tableNames)
                 {
-                    var tableName = dataRow["TABLE_NAME"];
-                    var tableData = new DataTable();
+                    var table = new DataTable();
                     using (var command = new OleDbCommand($"SELECT * FROM {tableName}", connection))
                     using (var reader = command.ExecuteReader())
                     {
-                        tableData.Load(reader);
+                        table.Load(reader);
                     }
 
                     var outputTableData = new List<IEnumerable<string>>();
-                    outputTableData.Add(
-                        tableData.Columns.Cast<DataColumn>().Select(dataColumn => dataColumn.ColumnName));
+                    var columnNames = table.Columns.OfType<DataColumn>().Select(column => column.ColumnName);
+                    outputTableData.Add(columnNames);
 
-                    foreach (DataRow rowData in tableData.Rows)
+                    foreach (var row in table.Rows.OfType<DataRow>())
                     {
-                        outputTableData.Add(rowData.ItemArray.Select(value => $"{value}"));
+                        outputTableData.Add(row.ItemArray.Select(value => $"{value}"));
                     }
 
                     var outputFilePath = Path.Combine(outputDirectoryPath, $"{tableName}.csv");
                     using (var writer = new StreamWriter(outputFilePath))
                     {
-                        foreach (var rowData in outputTableData)
+                        foreach (var row in outputTableData)
                         {
-                            writer.WriteLine(string.Join(",", rowData));
+                            writer.WriteLine(string.Join(",", row));
                         }
                     }
                 }
