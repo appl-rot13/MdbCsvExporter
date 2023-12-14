@@ -1,9 +1,14 @@
-MDB CSV Exporter
-=============
-MDBの各テーブルをCSVとして出力するツール。
+[English](README.md) | [日本語](README.ja.md)
 
-使い方
-------
+# MDB CSV Exporter
 
-MDBファイルをウィンドウにドラッグ＆ドロップしてください。  
-MDBファイルと同じフォルダにCSVファイルが出力されます。
+A tool to export each table in MDB files as CSV files.
+
+## Usage
+
+Drag and drop MDB files onto the window.
+Each table will be exported as CSV files to the same directory as the MDB file.
+
+## License
+
+This software is licensed under the [Unlicense](LICENSE).
